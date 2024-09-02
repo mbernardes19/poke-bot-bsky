@@ -1,0 +1,19 @@
+{
+  "name": "poke-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "ts-node index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@atproto/api": "^0.13.5",
+    "cron": "^3.1.7",
+    "dotenv": "^16.4.5",
+    "process": "^0.11.10"
+  }
+}
