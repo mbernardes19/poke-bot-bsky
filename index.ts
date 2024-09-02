@@ -50,14 +50,6 @@ async function getImageBlob(imageUrl: string) {
       console.error('Error fetching the image:', error);
     }
   }
-  
-  // Example usage
-  getImageBlob('https://example.com/image.jpg').then((blob) => {
-    if (blob) {
-      console.log('Blob obtained:', blob);
-    }
-  });
-  
 
 async function main() {
     try {
@@ -89,8 +81,9 @@ async function main() {
     }
 }
 
-main();
+// main();
 
+log('Running')
 
 // Run this on a cron job
 const scheduleExpression = process.env.CRONJOB as string; // Run daily at 7:05 in prof
