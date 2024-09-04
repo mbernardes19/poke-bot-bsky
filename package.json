@@ -2,22 +2,31 @@
   "name": "poke-bot",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node index.ts",
-    "build": "ts-node index.ts",
+    "build": "npx tsc && mv node_modules dist/node_modules && (cd dist && zip -r ../function.zip .)",
+    "upload-aws": "aws lambda update-function-code --function-name poke-bot --zip-file fileb:///Users/mbernardes/Desktop/workspace/poke-bot/function.zip",
+    "push": "npm run build && npm run upload-aws",
+    "sug:build": "node --loader ts-node/esm situation.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@atproto/api": "^0.13.5",
+    "@skyware/bot": "^0.3.2",
+    "axios": "^1.7.7",
     "cron": "^3.1.7",
     "dotenv": "^16.4.5",
-    "process": "^0.11.10"
+    "process": "^0.11.10",
+    "sharp": "^0.33.5"
   },
   "devDependencies": {
-    "ts-node": "^10.9.2"
+    "@types/aws-lambda": "^8.10.145",
+    "@types/node": "^22.5.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4",
+    "undici-types": "^6.19.8"
   }
 }
