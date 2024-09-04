@@ -2,7 +2,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda
 import { BskyAgent } from '@atproto/api';
 import * as dotenv from 'dotenv';
 import * as process from 'process';
-import { Pokemon, getImageBlob, PokemonSpecies } from '@pokebot/utils';
+import { Pokemon, getImageBlob, PokemonSpecies } from './utils';
 
 dotenv.config();
 
@@ -39,7 +39,7 @@ const fetchProductDescription = async (pok: Pokemon) => {
     return species.flavor_text_entries.find(description => description.language.name === 'en' && description.version.name === 'sword')?.flavor_text || ''
 }
 
-async function main(agent: BskyAgent) {
+async function main(agent: BskyAgent, event: APIGatewayProxyEvent) {
     try {
         await agent.login({ identifier: process.env.BLUESKY_USERNAME!, password: process.env.BLUESKY_PASSWORD!})
         const pok = await getRandomPokemon() as Pokemon
@@ -84,14 +84,15 @@ ${description}
     }
 }
 
-export const handler = async (): Promise<APIGatewayProxyResult> => {
+export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+    log(`Event: ${event}`)
     try {
         // Create a Bluesky Agent 
         const agent = new BskyAgent({
             service: 'https://bsky.social',
         })
         log(`Created agent`)
-        await main(agent)
+        await main(agent, event)
         log(`Posted successfully`)
         return {
             statusCode: 200,
@@ -108,5 +109,3 @@ export const handler = async (): Promise<APIGatewayProxyResult> => {
           };
     }
 };
-
-handler()

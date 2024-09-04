@@ -4,14 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "rm -rf dist && npx tsc && cp -R node_modules dist/node_modules",
+    "build": "rm -rf dist && npx tsc && cp -R node_modules dist/node_modules && (cd dist && zip -r ../function.zip .)",
+    "upload-aws": "aws lambda update-function-code --function-name poke-bot --zip-file fileb:///Users/mbernardes/Desktop/workspace/poke-bot/packages/poke-day/function.zip",
+    "push": "npm run build && npm run upload-aws",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@pokebot/utils": "file:../utils",
+    "@atproto/api": "^0.13.5",
     "dotenv": "^16.4.5",
     "process": "^0.11.10"
   },
