@@ -1,6 +1,6 @@
 import sharp from 'sharp'
 import * as dotenv from 'dotenv';
-import { getRandomPokemon } from '../../utils/index'
+import { getRandomPokemon } from '@pokebot/utils'
 
 dotenv.config();
 

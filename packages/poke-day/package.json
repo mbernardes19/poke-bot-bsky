@@ -1,12 +1,10 @@
 {
-  "name": "whosthat",
+  "name": "poke-day",
   "version": "1.0.0",
   "description": "",
-  "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node index.ts",
-    "build": "tsc",
+    "build": "rm -rf dist && npx tsc && cp -R node_modules dist/node_modules",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -15,7 +13,7 @@
   "dependencies": {
     "@pokebot/utils": "file:../utils",
     "dotenv": "^16.4.5",
-    "sharp": "^0.33.5"
+    "process": "^0.11.10"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.145",

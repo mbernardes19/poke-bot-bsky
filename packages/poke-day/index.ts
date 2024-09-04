@@ -2,48 +2,9 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda
 import { BskyAgent } from '@atproto/api';
 import * as dotenv from 'dotenv';
 import * as process from 'process';
+import { Pokemon, getImageBlob, PokemonSpecies } from '@pokebot/utils';
 
 dotenv.config();
-
-export type PokemonSprites = {
-    front_default: string
-    back_default: string
-    other: {
-        'official-artwork': {
-            front_default: string
-        }
-    }
-}
-
-export type PokemonSpeciesFlavorText = {
-    flavor_text: string
-    language: {
-        name: string
-    }
-    version: {
-        name: string
-    }
-}
-
-export type PokemonSpecies = {
-    flavor_text_entries: PokemonSpeciesFlavorText[]
-}
-
-export type Pokemon = {
-    sprites: PokemonSprites
-    id: number
-    name: string
-    height: number
-    weight: number
-    types: {
-        type: {
-            name: string
-        }
-    }[]
-    species: {
-        url: string
-    }
-}
 
 const getRandomNumber = (max: number) => {
     return Math.round(Math.random() * max) + 1
@@ -56,25 +17,6 @@ const getRandomPokemon = async () => {
 
 const log = (message: any) => {
     console.log(`[${new Date().toISOString()}] ${typeof message !== 'string' ? JSON.stringify(message) : message}`)
-}
-
-
-export async function getImageBlob(imageUrl: string) {
-    try {
-    // Fetch the image from the URL
-    const response = await fetch(imageUrl);
-
-    // Check if the fetch was successful
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-
-    // Convert the response into a Blob
-    const blob = await response.blob();
-    return blob;
-    } catch (error) {
-    console.error('Error fetching the image:', error);
-    }
 }
 
 const fetchImageData = async (pok: Pokemon, agent: BskyAgent) => {
