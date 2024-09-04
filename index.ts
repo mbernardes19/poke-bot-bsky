@@ -114,7 +114,7 @@ async function main(agent: BskyAgent) {
 Name: ${pok.name.charAt(0).toUpperCase()}${pok.name.slice(1)}
 Type: ${pok.types.map(type => `${type.type.name.charAt(0).toUpperCase()}${type.type.name.slice(1)}`).join(' / ')}
 Height: ${(pok.height * 0.1).toFixed(2)}m
-Weight: ${pok.weight * 0.1}kg
+Weight: ${(pok.weight * 0.1).toFixed(2)}kg
 
 ${description}
 `,
