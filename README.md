@@ -4,7 +4,7 @@ This is a monorepo containing a some of the pokémon related bots I'm building t
 ## poke-day
 A bot that fetches a random Pokémon from the [PokéAPI](https://pokeapi.co/) and posts it on a Blue Sky account. The post consists of general information about the Pokémon and images.
 
-This bot is deployed as a serverless function at AWS (Lambda)
+This bot is deployed as a serverless function at AWS (Lambda) and runs daily at 8:00AM BRT through a cronjob that triggers the function.
 
 Bot account: https://bsky.app/profile/pokemonoftheday.bsky.social
 
