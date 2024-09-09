@@ -2,11 +2,13 @@
   "name": "poke-day",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "build": "rm -rf dist && npx tsc && cp -R node_modules dist/node_modules && (cd dist && zip -r ../function.zip .)",
+    "prebuild": "cp -r ../utils/src/* ./utils/",
+    "build": "yarn prebuild && rm -rf dist && npx tsc && cp -r node_modules dist && (cd dist && zip -r ../function.zip .)",
+    "dev": "yarn build && node ./dist/index.js",
     "upload-aws": "aws lambda update-function-code --function-name poke-bot --zip-file fileb:///Users/mbernardes/Desktop/workspace/poke-bot/packages/poke-day/function.zip",
-    "push": "npm run build && npm run upload-aws",
+    "push": "yarn build && yarn upload-aws",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -15,10 +17,9 @@
   "dependencies": {
     "@atproto/api": "^0.13.5",
     "dotenv": "^16.4.5",
-    "process": "^0.11.10"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.145",
     "@types/node": "^22.5.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4",

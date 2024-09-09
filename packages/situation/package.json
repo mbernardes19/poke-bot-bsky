@@ -12,7 +12,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@pokebot/utils": "file:../utils",
     "@skyware/bot": "^0.3.2",
     "dotenv": "^16.4.5",
     "openai": "^4.57.1"

@@ -1,8 +1,6 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
-import { BskyAgent } from '@atproto/api';
-import * as dotenv from 'dotenv';
-import * as process from 'process';
-import { Pokemon, getImageBlob, PokemonSpecies } from './utils';
+import dotenv from 'dotenv';
+import { Pokemon, getImageBlob, PokemonSpecies, AtpBot, log } from './utils';
+import { Agent } from '@atproto/api';
 
 dotenv.config();
 
@@ -15,15 +13,11 @@ const getRandomPokemon = async () => {
     return await resp.json()
 }
 
-const log = (message: any) => {
-    console.log(`[${new Date().toISOString()}] ${typeof message !== 'string' ? JSON.stringify(message) : message}`)
-}
-
-const fetchImageData = async (pok: Pokemon, agent: BskyAgent) => {
+const fetchImageData = async (pok: Pokemon, agent: Agent) => {
     const blobs = await Promise.all([
         getImageBlob(pok.sprites.other['official-artwork'].front_default),
         getImageBlob(pok.sprites.front_default),
-        getImageBlob(pok.sprites.back_default)
+        getImageBlob(pok.sprites.back_default || pok.sprites.other.showdown.back_default)
     ])
     const uploadedImages = Promise.all([
         agent.uploadBlob(blobs[0], {encoding: 'image/png'}),
@@ -34,24 +28,44 @@ const fetchImageData = async (pok: Pokemon, agent: BskyAgent) => {
 }
 
 const fetchProductDescription = async (pok: Pokemon) => {
+    const hasSwordDescription = (description: any) =>
+            description.language.name === 'en' &&
+                description.version.name === 'sword'
+
+    const hasSunDescription = (description: any) =>
+        description.language.name === 'en' &&
+            description.version.name === 'sun'
+
     const resp = await fetch(pok.species.url)
     const species = await resp.json() as PokemonSpecies
-    return species.flavor_text_entries.find(description => description.language.name === 'en' && description.version.name === 'sword')?.flavor_text || ''
+    return species.flavor_text_entries.find(
+        description =>
+            hasSwordDescription(description)
+        )?.flavor_text ||
+        species.flavor_text_entries.find(
+            description =>
+                hasSunDescription(description)
+        )?.flavor_text || ''
 }
 
-async function main(agent: BskyAgent, event: APIGatewayProxyEvent) {
+async function main(event?: any) {
     try {
-        await agent.login({ identifier: process.env.BLUESKY_USERNAME!, password: process.env.BLUESKY_PASSWORD!})
+        const bot = new AtpBot()
+        console.log('=== created bot')
+        console.log(process.env.BLUESKY_USERNAME!, process.env.BLUESKY_PASSWORD!)
+        await bot.login(process.env.BLUESKY_USERNAME!, process.env.BLUESKY_PASSWORD!)
+        console.log('=== authenticated bot')
         const pok = await getRandomPokemon() as Pokemon
+        console.log('=== got random pokemon')
         log(pok)
 
         const [images, description] = await Promise.all([
-            fetchImageData(pok, agent),
+            fetchImageData(pok, bot.getAgent()),
             fetchProductDescription(pok)
         ])
         
         log(images)
-            await agent.post({
+            await bot.post({
                 text: `Number: ${pok.id}
 Name: ${pok.name.charAt(0).toUpperCase()}${pok.name.slice(1)}
 Type: ${pok.types.map(type => `${type.type.name.charAt(0).toUpperCase()}${type.type.name.slice(1)}`).join(' / ')}
@@ -84,15 +98,11 @@ ${description}
     }
 }
 
-export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+export const handler = async (event: any): Promise<any> => {
     log(`Event: ${event}`)
     try {
-        // Create a Bluesky Agent 
-        const agent = new BskyAgent({
-            service: 'https://bsky.social',
-        })
         log(`Created agent`)
-        await main(agent, event)
+        await main(event)
         log(`Posted successfully`)
         return {
             statusCode: 200,

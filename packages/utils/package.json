@@ -2,7 +2,7 @@
   "name": "@pokebot/utils",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "rm -rf dist && npx tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -15,5 +15,12 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4",
     "undici-types": "^6.19.8"
+  },
+  "dependencies": {
+    "@atproto/api": "^0.13.5",
+    "@atproto/common-web": "^0.3.0",
+    "@atproto/lexicon": "^0.4.1",
+    "@atproto/syntax": "^0.3.0",
+    "multiformats": "^13.2.2"
   }
 }

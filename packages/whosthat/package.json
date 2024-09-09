@@ -13,7 +13,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@pokebot/utils": "file:../utils",
     "dotenv": "^16.4.5",
     "sharp": "^0.33.5"
   },

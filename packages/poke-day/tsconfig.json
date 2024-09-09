@@ -4,8 +4,10 @@
         "rootDir": ".",
         "outDir": "./dist"
     },
-    "include": ["."],
     "references": [
-        { "path": "../utils"}
-    ]
+        {
+            "path": "../utils"
+        }
+    ],
+    "include": ["."]
 }

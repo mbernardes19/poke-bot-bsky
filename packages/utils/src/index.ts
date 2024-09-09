@@ -1,9 +1,16 @@
+import { AtpBot } from "./AtpBot"
+
+export { AtpBot }
+
 export type PokemonSprites = {
     front_default: string
     back_default: string
     other: {
         'official-artwork': {
             front_default: string
+        },
+        showdown: {
+            back_default: string
         }
     }
 }
@@ -63,4 +70,8 @@ export async function getImageBlob(imageUrl: string) {
     } catch (error) {
     console.error('Error fetching the image:', error);
     }
+}
+
+export const log = (message: any) => {
+    console.log(`[${new Date().toISOString()}] ${typeof message !== 'string' ? JSON.stringify(message) : message}`)
 }
