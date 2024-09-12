@@ -3,7 +3,13 @@ import OpenAI from 'openai'
 import { zodResponseFormat } from "openai/helpers/zod";
 import { z } from "zod";
 import { Pokemon, PokemonSprites, log, AtpBot } from './utils';
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { APIGatewayProxyResult } from 'aws-lambda';
+
+
+type WebhookEvent = {
+    body: string
+    headers: Record<string, string>
+}
 
 type FirehoseEvent = {
     action: 'create'
@@ -12,7 +18,17 @@ type FirehoseEvent = {
     record: {
         text: string
         $type: string
-        langs: string[]
+        langs: string[],
+        reply?: {
+            parent: {
+                cid: string,
+                uri: string
+            },
+            root: {
+                cid: string,
+                uri: string
+            }
+        },
         facets:
             {
                 $type: string
@@ -24,7 +40,7 @@ type FirehoseEvent = {
                     did: string
                     $type: string
                 }[]
-            }[]
+            }[],
         createdAt: string
     },
     uri: string
@@ -46,12 +62,14 @@ const PokemonSuggestion = z.object({
     description: z.string()
 })
 
-async function main(event: FirehoseEvent): Promise<void> {
+async function main(event: WebhookEvent): Promise<void> {
   try {
+    log('=== event' + JSON.stringify(event))
+    const eventPayload = JSON.parse(event.body) as FirehoseEvent
     const bot = new AtpBot()
     await bot.login(process.env.BLUESKY_USERNAME!, process.env.BLUESKY_PASSWORD!)
 
-    const prompt = event.record.text.slice(0, 200)
+    const prompt = eventPayload.record.text.slice(0, 200)
     const completion = await openai.beta.chat.completions.parse({
         model: 'gpt-4o-mini',
         messages: [
@@ -62,47 +80,46 @@ async function main(event: FirehoseEvent): Promise<void> {
     })
     console.log('ChatGPT Response:', completion.choices[0].message.parsed);
     const sprites = await getPokemonImagesByName(completion.choices[0].message.parsed?.name!)
+
     await bot.post({
-        reply: {
-            parent: {
-                uri: event.uri,
-                cid: event.cid
-            },
-            root: {
-                uri: event.uri,
-                cid: event.cid
-            }
-        },
-        text: completion.choices[0].message.parsed?.description!,
+        // Remove @ mention
+        message: completion.choices[0].message.parsed?.description?.replace(/@\S+\s?/,'')!,
         images: [
             {
-                data: sprites.other['official-artwork'].front_default,
-                alt: completion.choices[0].message.parsed?.description
+                url: sprites.other['official-artwork'].front_default,
+                alt: completion.choices[0].message.parsed?.description || ''
             },
             {
-                data: sprites.front_default,
-                alt: completion.choices[0].message.parsed?.description
+                url: sprites.front_default || sprites.other.showdown.front_default,
+                alt: completion.choices[0].message.parsed?.description || ''
             },
             {
-                data: sprites.back_default,
-                alt: completion.choices[0].message.parsed?.description
+                url: sprites.back_default || sprites.other.showdown.back_default,
+                alt: completion.choices[0].message.parsed?.description || ''
             }
-        ]
+        ],
+        originalMessage: eventPayload
     })
+
   } catch (error) {
-    if (error) {
-      console.error('Error:', error);
-    } else {
-      console.error('Unexpected Error:', error);
-    }
+    throw new Error(`error in main: ${error}`)
   }
 }
 
-export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    log(`Event: ${event.body}`)
+export const handler = async (event: WebhookEvent): Promise<APIGatewayProxyResult> => {
+    log(`Event: ${JSON.stringify(event)}`)
+    if (event.headers['x-au-key'] !== process.env.KEY) {
+        return {
+            statusCode: 401,
+            body: JSON.stringify({
+              message: 'Unauthenticated'
+            }),
+          };
+    }
+
     try {
         log(`Created agent`)
-        await main(JSON.parse(event.body!) as FirehoseEvent)
+        await main(event as WebhookEvent)
         log(`Posted successfully`)
         return {
             statusCode: 200,

@@ -2,18 +2,21 @@
   "name": "situation",
   "version": "1.0.0",
   "description": "",
-  "type": "module",
   "main": "index.js",
   "scripts": {
-    "build": "rm -rf dist && npx tsc && cp -R node_modules dist/node_modules",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prebuild": "cp -r ../utils/src/* ./utils/",
+    "build": "yarn prebuild && rm -rf dist && npx tsc && cp -r node_modules dist && (cd dist && zip -r ../function.zip .)",
+    "dev": "yarn build && node ./dist/index.js",
+    "upload-aws": "aws lambda update-function-code --function-name poke-situation --zip-file fileb:///Users/mbernardes/Desktop/workspace/poke-bot/packages/situation/function.zip",
+    "push": "yarn build && yarn upload-aws"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@skyware/bot": "^0.3.2",
+    "@atproto/api": "^0.13.7",
     "dotenv": "^16.4.5",
+    "multiformats": "^9.9.0",
     "openai": "^4.57.1"
   },
   "devDependencies": {
