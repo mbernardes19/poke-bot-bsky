@@ -8,8 +8,7 @@
     "build": "yarn prebuild && rm -rf dist && npx tsc && cp -r node_modules dist && (cd dist && zip -r ../function.zip .)",
     "dev": "yarn build && node ./dist/index.js",
     "upload-aws": "aws lambda update-function-code --function-name poke-bot --zip-file fileb:///Users/mbernardes/Desktop/workspace/poke-bot/packages/poke-day/function.zip",
-    "push": "yarn build && yarn upload-aws",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "push": "yarn build && yarn upload-aws"
   },
   "keywords": [],
   "author": "",

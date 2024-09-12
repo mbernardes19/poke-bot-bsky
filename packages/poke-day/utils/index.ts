@@ -1,5 +1,5 @@
 import { AtpBot } from './AtpBot'
-import { getRandomPokemon, latestPokemonGamesByGeneration, getRandomNumber, Pokemon, PokemonSpecies } from './Pokemon'
+import { getRandomPokemon, latestPokemonGamesByGeneration, getRandomNumber, Pokemon, PokemonSpecies, PokemonSprites } from './Pokemon'
 
 export { 
     AtpBot,
@@ -7,7 +7,8 @@ export {
     latestPokemonGamesByGeneration,
     getRandomNumber,
     Pokemon,
-    PokemonSpecies
+    PokemonSpecies,
+    PokemonSprites
 }
 
 export const log = (message: any) => {
