@@ -49,7 +49,7 @@ type FirehoseEvent = {
 dotenv.config();
 
 const getPokemonImagesByName = async (name: string): Promise<PokemonSprites> => {
-    const resp = await fetch('https://pokeapi.co/api/v2/pokemon/' + name.toLowerCase().replace(/[^a-z0-9\s]/gi, '').replace(/\s+/g, '-'))
+    const resp = await fetch('https://pokeapi.co/api/v2/pokemon/' + name.toLowerCase().replace(/[^a-zA-Z0-9- ]/g, '').replace(/\s+/g, '-'))
     const pokemon = await resp.json() as Pokemon
     return pokemon.sprites
 }
@@ -70,7 +70,7 @@ async function main(event: WebhookEvent): Promise<void> {
     await bot.login(process.env.BLUESKY_USERNAME!, process.env.BLUESKY_PASSWORD!)
 
     eventPayload.record.langs
-    const prompt = eventPayload.record.text.slice(0, 269).replace(/@\S+\s?/,'')
+    const prompt = `${eventPayload.record.text.slice(0, 269).replace(/@\S+\s?/,'')}. language:${eventPayload.record.langs.join('')}`
     const completion = await openai.beta.chat.completions.parse({
         model: 'gpt-4o-mini',
         messages: [
