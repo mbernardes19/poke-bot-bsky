@@ -69,8 +69,8 @@ async function main(event: WebhookEvent): Promise<void> {
     const bot = new AtpBot()
     await bot.login(process.env.BLUESKY_USERNAME!, process.env.BLUESKY_PASSWORD!)
 
-    eventPayload.record.langs
-    const prompt = `${eventPayload.record.text.slice(0, 269).replace(/@\S+\s?/,'')}. language:${eventPayload.record.langs.join('')}`
+    const lang = `${eventPayload.record.langs?.[0] ? `lang: ${eventPayload.record.langs?.[0]}` : ''}`
+    const prompt = `${eventPayload.record.text.slice(0, 269).replace(/@\S+\s?/,'')}. ${lang}`
     const completion = await openai.beta.chat.completions.parse({
         model: 'gpt-4o-mini',
         messages: [
