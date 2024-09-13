@@ -69,7 +69,7 @@ async function main(event: WebhookEvent): Promise<void> {
     const bot = new AtpBot()
     await bot.login(process.env.BLUESKY_USERNAME!, process.env.BLUESKY_PASSWORD!)
 
-    const prompt = eventPayload.record.text.slice(0, 200)
+    const prompt = eventPayload.record.text.slice(0, 269).replace(/@\S+\s?/,'')
     const completion = await openai.beta.chat.completions.parse({
         model: 'gpt-4o-mini',
         messages: [
@@ -83,7 +83,7 @@ async function main(event: WebhookEvent): Promise<void> {
 
     await bot.post({
         // Remove @ mention
-        message: completion.choices[0].message.parsed?.description?.replace(/@\S+\s?/,'')!,
+        message: completion.choices[0].message.parsed?.description!,
         images: [
             {
                 url: sprites.other['official-artwork'].front_default,
