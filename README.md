@@ -11,7 +11,9 @@ Bot account: https://bsky.app/profile/pokemonoftheday.bsky.social
 ## situation
 A bot that forwards messages from posts where it's tagged to ChatGPT and sends a reply telling which Pokémon best matches that message. It also makes requests to [PokéAPI](https://pokeapi.co/) to get the Pokémon images.
 
-Although it's working locally, I've not deployed it yet because I'm preparing another application using [atproto-firehose](https://github.com/kcchu/atproto-firehose) to only send posts with mentions to the bot application. This way I'll be able to deploy this and the other bots as serverless functions.
+This bot is deployed as a serverless function at AWS (Lambda) that gets triggered whenever there's a post mentioning the bot account. The post events are filtered and sent by this firehose consumer I also developed: [firehose-webhook](https://github.com/mbernardes19/firehose-webhook).
+
+Bot account: https://bsky.app/profile/pokemonsuggestion.bsky.social
 
 ## whosthat
 A bot that gets a random Pokémon image from the [PokéAPI](https://pokeapi.co/) and uses [sharp](https://github.com/lovell/sharp) to transform it into a silhouette and post it on Bluesky asking "Who's that Pokémon?".
